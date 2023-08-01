@@ -10,6 +10,10 @@ Tests (also for missing values in obs data)
 KGE
 log NSE
 Spearman rank correlation
+
+For ranking, see argsort for numpy
+Go implementation: https://github.com/mkmik/argsort
+SO: https://stackoverflow.com/questions/31141202/get-the-indices-of-the-array-after-sorting-in-golang
 */
 
 package gohbv
