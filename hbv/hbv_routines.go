@@ -6,7 +6,7 @@ This file contains HBV model routines for
 - Routing
 */
 
-package gohbv
+package hbv
 
 import (
 	"math"
@@ -163,6 +163,7 @@ func ResponseRoutine(mState []ModelState, mPars Parameters, i int) {
 	mState[i].S_gw_slz = mState[i-1].S_gw_slz + percolation
 
 	// Groundwater discharge
+	// TODO save q_lz, q_uz, q_uzt for routing in mState Q2, Q1, Q0 respectively
 	q_lz := mPars.K2 * mState[i].S_gw_slz
 	q_uz := mPars.K1 * mState[i].S_gw_suz
 	q_uzt := mPars.K0 * math.Max(mState[i].S_gw_suz-mPars.UZL, 0)
@@ -183,6 +184,11 @@ func RoutingRoutine(mState []ModelState, mPars Parameters, inData []InputData, i
 		if ij >= len(inData) {
 			break
 		}
+
+		// TODO: instead of maxbasing the Q_gw, maxbas the the components of Q_gw (Q0, Q1, Q2)
+		// Then sum the maxbased components to get the Q_sim
+		// Probably need mState[ij].Q1 = mstate[ij].Q1 + mState[i].Q1*maxbas[j] etc
+
 		mState[ij].Q_sim = mState[ij].Q_sim + mState[i].Q_gw*maxbas[j]
 	}
 }

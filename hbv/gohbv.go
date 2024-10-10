@@ -1,11 +1,9 @@
 /*
 Function to run the gohbv model.
 
-To be implemented:
-cli support
 */
 
-package gohbv
+package hbv
 
 // Model state and fluxes - available across module
 type ModelState struct {
@@ -34,12 +32,17 @@ func RunModel(mPars Parameters, inData []InputData) ([]ModelState, error) {
 	// All the uninitialized fields are set to zero value (0)
 	var mState = make([]ModelState, len(inData))
 
+	// Routing with MAXBAS (only need to get the maxbas array once)
+	maxbas := RoutingMaxbasWeights(mPars)
+
+	// To get the first timestep simulated as well we clone the first state and input data
+	mState = append([]ModelState{mState[0]}, mState...)
+	inData = append([]InputData{inData[0]}, inData...)
+
 	// Set initial soil moisture to FP * LP
 	mState[0].S_soil = mPars.FC * mPars.LP
 	// Initial Lower Zone groundwater storage
 	mState[0].S_gw_slz = mPars.PERC / mPars.K2
-	// Routing with MAXBAS (only need to get the maxbas array once)
-	maxbas := RoutingMaxbasWeights(mPars)
 
 	// Forward Euler loop
 	for i := 1; i < len(inData); i++ { // Loop starts on second index (1), first is initial state (zeros)
@@ -48,6 +51,8 @@ func RunModel(mPars Parameters, inData []InputData) ([]ModelState, error) {
 		ResponseRoutine(mState, mPars, i)
 		RoutingRoutine(mState, mPars, inData, i, maxbas)
 	}
+	// pop the first element (initial state) of mState which is the forced initial state appended above
+	mState = mState[1:]
 
 	return mState, nil
 }

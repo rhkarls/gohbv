@@ -1,7 +1,14 @@
 module github.com/rhkarls/gohbv
 
-go 1.17
+go 1.23.1
 
-require gonum.org/v1/gonum v0.9.3
+require (
+	github.com/spf13/cobra v1.8.1
+	gonum.org/v1/gonum v0.9.3
+)
 
-require golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
+require (
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
+)

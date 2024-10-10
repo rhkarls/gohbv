@@ -12,7 +12,7 @@ log NSE
 Spearman rank correlation
 */
 
-package gohbv
+package hbv
 
 import (
 	"math"
