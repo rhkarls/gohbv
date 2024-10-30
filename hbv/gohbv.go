@@ -1,6 +1,5 @@
 /*
 Function to run the gohbv model.
-
 */
 
 package hbv
@@ -26,7 +25,7 @@ type ModelState struct {
 }
 
 // GoHBV function is used to run the HBV model based on an InputData and Parameters structs.
-// The function call returns an array of ModelState structs
+// The function returns an array of ModelState structs
 func RunModel(mPars Parameters, inData []InputData) ([]ModelState, error) {
 	// Set model states
 	// All the uninitialized fields are set to zero value (0)
@@ -39,19 +38,19 @@ func RunModel(mPars Parameters, inData []InputData) ([]ModelState, error) {
 	mState = append([]ModelState{mState[0]}, mState...)
 	inData = append([]InputData{inData[0]}, inData...)
 
-	// Set initial soil moisture to FP * LP
+	// Set initial soil moisture to FP * LP, following HBV-light
 	mState[0].S_soil = mPars.FC * mPars.LP
-	// Initial Lower Zone groundwater storage
+	// Initial Lower Zone groundwater storage, following HBV-light
 	mState[0].S_gw_slz = mPars.PERC / mPars.K2
 
 	// Forward Euler loop
-	for i := 1; i < len(inData); i++ { // Loop starts on second index (1), first is initial state (zeros)
+	for i := 1; i < len(inData); i++ { // Loop starts on second index (1), first is initial state
 		SnowRoutine(mState, mPars, inData, i)
 		SoilRoutine(mState, mPars, inData, i)
 		ResponseRoutine(mState, mPars, i)
 		RoutingRoutine(mState, mPars, inData, i, maxbas)
 	}
-	// pop the first element (initial state) of mState which is the forced initial state appended above
+	// pop the first element (initial state) of mState which is the appended initial state set above
 	mState = mState[1:]
 
 	return mState, nil
