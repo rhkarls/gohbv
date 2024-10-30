@@ -45,16 +45,21 @@ func TestRunModelQSim(t *testing.T) {
 	n_passed := 0
 
 	for i, record := range records {
-		if i == 0 {
-			continue // Skip header
+		if i <= 1 {
+			continue // Skip header, kip first row sensitive to initial conditions
 		}
+
 		qSimBenchmark, err := strconv.ParseFloat(record[1], 64) // Assuming Qsim is the 2nd column
 		if err != nil {
 			t.Fatalf("Error parsing benchmark Qsim value: %v", err)
 		}
 		qSimModel := hbvResult[i-1].Q_sim
 
-		if math.Abs(qSimModel-qSimBenchmark) > 1.001 {
+		// each individual time step value should not have an absolute error above 0.001 mm
+		// *and* a relative error above 0.5 % (might be more reasonable to set to 1%?)
+		// i.e. very small values can get large relative error, but is very close absolute
+		// very large values can get large absolute errors, but these are small relative errors
+		if (math.Abs(qSimModel-qSimBenchmark) > 0.001) && ((qSimModel-qSimBenchmark)/qSimBenchmark*100 > 0.5) {
 			t.Errorf("Mismatch at row %d: model Q_sim = %f, benchmark Q_sim = %f", i, qSimModel, qSimBenchmark)
 			n_failed++
 		} else {

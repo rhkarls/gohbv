@@ -7,15 +7,13 @@ import (
 )
 
 func TestWaterBalanceAccounting(t *testing.T) {
-	// Read input data
+
 	inputDataFile := "test_data/test_case_sp0_go_hbv_input.csv"
 	inData := hbv.ReadInputData(inputDataFile)
 
-	// Read parameters
 	parameterFile := "test_data/test_case_sp0_hbv_parameters.json"
 	mPars := hbv.ReadParameters(parameterFile)
 
-	// Run model
 	hbvResult, err := hbv.RunModel(mPars, inData)
 	if err != nil {
 		t.Fatalf("Error running model: %v", err)
@@ -35,13 +33,11 @@ func TestWaterBalanceAccounting(t *testing.T) {
 		}
 	}
 
-	// Calculate the sum of the input data Precipitation field
 	var sumPrecipitation float64
 	for _, data := range inData {
 		sumPrecipitation += data.Precipitation
 	}
 
-	// Calculate the sum of the outputs and storages
 	var sumOutputs, sumStorages float64
 	for _, state := range hbvResult {
 		sumOutputs += state.Q_sim + state.AET
@@ -50,6 +46,7 @@ func TestWaterBalanceAccounting(t *testing.T) {
 
 	sumOutputs += snowRoutineLoss
 	sumStorages -= smAddedState + lzAddedState
+
 	// Compare the two sums
 	// Should not be > 1 mm difference
 	if math.Abs(sumPrecipitation-(sumOutputs+sumStorages)) > 1.0 {
